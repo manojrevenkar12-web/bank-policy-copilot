@@ -1,0 +1,32 @@
+# Words employees use for what the policies call something else. Applied to questions only.
+# Maintained by the policy owners; each entry maps a colloquial term to policy vocabulary.
+instant: echtzeitüberweisung
+"instant payments": echtzeitüberweisungen
+"instant payment": echtzeitüberweisung
+hotel: übernachtung
+hotelkosten: übernachtungskosten
+homeoffice: "mobiles arbeiten"
+"home office": "mobiles arbeiten"
+backup: datensicherung
+backups: datensicherungen
+passwort: passwörter
+kennwort: passwort
+"var-limit": "value-at-risk-limit"
+var: "value-at-risk"
+geschenk: geschenke
+pep: "politisch exponierte person"
+kyc: kundendaten
+zweitfreigabe: "vier-augen-prinzip"
+"4-augen-prinzip": "vier-augen-prinzip"
+gewerbeimmobilie: "gewerblich genutzte immobilie"
+gewerbeimmobilien: "gewerblich genutzte immobilien"
+wohnimmobilie: "wohnwirtschaftlich genutzte immobilie"
+wohnimmobilien: "wohnwirtschaftlich genutzte immobilien"
+"hoch kritisch": "hoher kritikalität"
+"hoch kritische": "hoher kritikalität"
+haircut: sicherheitenabschlag
+cve: schwachstelle
+soc: "security operations center"
+phishing: sicherheitsvorfall
+aktien: wertpapiere
+summe: betrag

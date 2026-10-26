@@ -1,0 +1,9 @@
+# Retrieval and answering thresholds. Tuned on the dev questions only (see AGENTS.md).
+candidates_per_path: 40      # paragraphs each retrieval path returns before fusion
+rrf_k: 60                    # reciprocal rank fusion constant
+evidence: 6                  # paragraphs handed to the answerer
+min_overlap: 0.40            # share of the question's content words a paragraph must cover to be evidence
+history_penalty: 0.5         # rank weight of change-history paragraphs unless the question asks what changed
+section_boost: 0.25          # extra weight when the question's words appear in the section title
+embedding_dim: 384
+unknown_word_weight: 0.6     # share of the rarest word's weight given to a word no paragraph uses

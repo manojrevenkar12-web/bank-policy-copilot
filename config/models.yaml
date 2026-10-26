@@ -1,0 +1,24 @@
+# Model registry: which model may see which classification of content, and where it runs.
+# The router sends a question's evidence to the first enabled model allowed to see all of it;
+# anything above every enabled model's ceiling is answered by the local extractive answerer.
+models:
+  - id: claude
+    provider: anthropic
+    model: claude-sonnet-5-5
+    enabled_if_env: ANTHROPIC_API_KEY
+    max_classification: 2        # öffentlich and intern only
+    processing: "external API (contract: no training on inputs, EU data processing addendum)"
+    price_per_mtok: { input: 3.0, output: 15.0 }
+  - id: azure-openai-eu
+    provider: azure_openai
+    model: gpt-5-eu
+    enabled_if_env: AZURE_OPENAI_ENDPOINT
+    max_classification: 3        # up to vertraulich, EU region
+    processing: "Azure OpenAI, region Germany West Central"
+    price_per_mtok: { input: 2.5, output: 10.0 }
+  - id: extractive
+    provider: extractive
+    model: extractive-v1
+    max_classification: 4        # runs inside the bank; quotes the paragraph, invents nothing
+    processing: "in process"
+    price_per_mtok: { input: 0.0, output: 0.0 }
