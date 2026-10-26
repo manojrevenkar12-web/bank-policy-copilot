@@ -43,6 +43,9 @@ resource "azurerm_container_app_environment" "main" {
 }
 
 locals {
+  # Whether a key was given is not secret; the key itself stays sensitive.
+  use_anthropic = nonsensitive(var.anthropic_api_key != "")
+
   db_host = azurerm_postgresql_flexible_server.main.fqdn
   # The app connects as copilot_app (created by the migration), never as the admin: row-level
   # security applies to it.
@@ -88,10 +91,11 @@ resource "azurerm_container_app" "api" {
   }
 
   dynamic "secret" {
-    for_each = var.anthropic_api_key == "" ? [] : [var.anthropic_api_key]
+    # A sensitive value cannot drive for_each, so only whether a key was given decides.
+    for_each = local.use_anthropic ? toset(["anthropic-api-key"]) : toset([])
     content {
-      name  = "anthropic-api-key"
-      value = secret.value
+      name  = secret.value
+      value = var.anthropic_api_key
     }
   }
 
@@ -129,7 +133,7 @@ resource "azurerm_container_app" "api" {
       }
 
       dynamic "env" {
-        for_each = var.anthropic_api_key == "" ? [] : ["anthropic-api-key"]
+        for_each = local.use_anthropic ? toset(["anthropic-api-key"]) : toset([])
         content {
           name        = "ANTHROPIC_API_KEY"
           secret_name = env.value
