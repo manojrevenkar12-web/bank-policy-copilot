@@ -36,6 +36,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 copilot = ["migrations/*.sql"]
+copilot_sim = ["blind/*.json", "blind/*.md", "blind/corpus/*.md", "regression/*/*.json"]
 
 [tool.ruff]
 line-length = 120

@@ -55,7 +55,10 @@ def route(specs: tuple[ModelSpec, ...], evidence: list[Candidate]) -> tuple[Mode
     needed = max((c.classification for c in evidence), default=1)
     for spec in specs:
         if spec.enabled and spec.max_classification >= needed:
-            return spec, f"Belege bis Einstufung {needed}; {spec.id} darf bis Einstufung {spec.max_classification} sehen"
+            return (
+                spec,
+                f"Belege bis Einstufung {needed}; {spec.id} darf bis Einstufung {spec.max_classification} sehen",
+            )
     raise RuntimeError("no model may see this evidence; config/models.yaml needs an in-process answerer")
 
 
@@ -87,7 +90,9 @@ class Extractive:
             a = Answer("answered", text, [best], self.spec.id)
         if p is not None and self.model is not None:
             a.notes.append(
-                f"Antwortbarkeit {p:.2f} (Schwelle {self.model.threshold:.2f}, Modell {self.model.version})".replace(".", ",")
+                f"Antwortbarkeit {p:.2f} (Schwelle {self.model.threshold:.2f}, Modell {self.model.version})".replace(
+                    ".", ","
+                )
             )
         return a
 

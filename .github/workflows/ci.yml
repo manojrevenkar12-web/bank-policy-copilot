@@ -1,0 +1,150 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: backend (lint, types, tests on Postgres + pgvector)
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env: { POSTGRES_PASSWORD: postgres }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U postgres" --health-interval 2s --health-retries 30
+    env:
+      COPILOT_TEST_ADMIN_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    defaults: { run: { working-directory: backend } }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: backend/pyproject.toml }
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: ruff format --check src tests
+      - run: mypy
+      - run: pytest -q
+
+  web:
+    name: web (lint, types, unit tests, build)
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: web } }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm, cache-dependency-path: web/package-lock.json }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npx vite build
+
+  e2e:
+    name: evaluation gate and end-to-end (Playwright) on a seeded stack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: copilot }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U postgres" --health-interval 2s --health-retries 30
+    env:
+      COPILOT_DEMO_MODE: "true"
+      COPILOT_CORS_ORIGIN: http://localhost:4173
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: backend/pyproject.toml }
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm, cache-dependency-path: web/package-lock.json }
+      - run: pip install -e "backend[sim]"
+      - name: Seed the simulated bank
+        working-directory: backend
+        run: python -m copilot_sim seed 2>&1 | tee ../seed.log
+      - name: Evaluate (dev, regression, blind) and apply the release gate
+        working-directory: backend
+        run: |
+          set -o pipefail
+          python -m copilot_sim evaluate 2>&1 | tee ../evaluate.log
+          python -m copilot_sim gate 2>&1 | tee -a ../evaluate.log
+      - name: Start the API and the web app
+        run: |
+          (cd backend && nohup uvicorn copilot.api.app:create_app --factory --port 8000 > ../api.log 2>&1 &)
+          cd web && npm ci && npx vite build
+          (nohup npx vite preview --port 4173 --strictPort > ../web.log 2>&1 &)
+          npx --yes wait-on@8 -t 60000 http-get://localhost:4173/api/health http-get://localhost:4173/
+      - name: Playwright
+        working-directory: web
+        run: |
+          set -o pipefail
+          npx playwright install --with-deps chromium
+          npx playwright test 2>&1 | tee ../playwright.log
+      - name: Report failures as annotations
+        if: failure()
+        run: |
+          for f in seed.log evaluate.log playwright.log api.log; do
+            [ -f "$f" ] || continue
+            body=$(sed 's/\x1b\[[0-9;]*m//g' "$f" | grep -vE '^\s*$' | grep -E -A4 'Error|error|GATE|✘|failed|Traceback' | head -120 | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+            [ -n "$body" ] && echo "::error title=$f::$body"
+          done
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-and-evaluation
+          path: |
+            reports/
+            web/playwright-report/
+            *.log
+
+  infra:
+    name: Terraform (Azure)
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: deploy/terraform } }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: 1.9.8, terraform_wrapper: false }
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false -input=false
+      - name: terraform validate
+        run: |
+          terraform validate -no-color > validate.log 2>&1 || {
+            body=$(sed 's/%/%25/g' validate.log | sed ':a;N;$!ba;s/\n/%0A/g'); echo "::error title=terraform validate::$body"; exit 1; }
+
+  images:
+    name: container images and smoke test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with: { context: ., file: backend/Dockerfile, target: api, tags: "copilot-api:ci", load: true, cache-from: type=gha, cache-to: "type=gha,mode=max" }
+      - uses: docker/build-push-action@v6
+        with: { context: ., file: backend/Dockerfile, target: tools, tags: "copilot-tools:ci", load: true, cache-from: type=gha }
+      - uses: docker/build-push-action@v6
+        with: { context: ., file: web/Dockerfile, tags: "copilot-web:ci", load: true, cache-from: type=gha }
+      - name: Smoke test the images
+        run: |
+          set -e
+          docker network create bpc
+          docker run -d --name postgres --network bpc -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=copilot pgvector/pgvector:pg17
+          until docker exec postgres pg_isready -U postgres; do sleep 1; done
+          env="-e COPILOT_DATABASE_URL=postgresql://copilot_app:copilot_app@postgres:5432/copilot -e COPILOT_ADMIN_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/copilot -e COPILOT_TOKEN_SECRET=ci-smoke-secret-with-at-least-32-chars -e COPILOT_DEMO_MODE=true"
+          docker run --rm --network bpc $env copilot-api:ci copilot migrate
+          docker run --rm --network bpc $env copilot-tools:ci seed /tmp/export
+          docker run -d --name api --network bpc $env copilot-api:ci
+          docker run -d --name web --network bpc -p 8080:8080 -e API_UPSTREAM=http://api:8000 copilot-web:ci
+          npx --yes wait-on@8 -t 60000 http-get://localhost:8080/api/health
+          token=$(curl -fsS -X POST localhost:8080/api/session -H 'content-type: application/json' -d '{"login":"lena.vogt"}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["token"])')
+          curl -fsS -X POST localhost:8080/api/ask -H "authorization: Bearer $token" -H 'content-type: application/json' \
+            -d '{"question":"Ab welchem Betrag müssen Zahlungen im Vier-Augen-Prinzip freigegeben werden?","as_of":"2026-10-01"}' | grep -q '10.000 EUR'
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080/api/metrics)" = 404

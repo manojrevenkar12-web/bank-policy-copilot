@@ -1,0 +1,5 @@
+resource_group_name  = "rg-bpc-tfstate"
+storage_account_name = "bpctfstate"
+container_name       = "tfstate"
+key                  = "prod.tfstate"
+use_azuread_auth     = true
