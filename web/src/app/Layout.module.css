@@ -1,0 +1,112 @@
+.shell {
+  display: grid;
+  grid-template-columns: var(--rail-width) minmax(0, 1fr);
+  min-height: 100vh;
+}
+.rail {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  height: 100vh;
+  padding: var(--space-5) var(--space-4);
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+.brand small {
+  display: block;
+  font-weight: var(--weight-regular);
+  color: var(--color-line-strong);
+  font-size: var(--text-xs);
+}
+.mark {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-control);
+  background:
+    linear-gradient(var(--color-line-strong), var(--color-line-strong)) 0.35rem 0.4rem / 1.05rem 0.18rem
+      no-repeat,
+    linear-gradient(var(--color-inforce-bright), var(--color-inforce-bright)) 0.35rem 0.78rem / 0.65rem
+      0.18rem no-repeat,
+    linear-gradient(var(--color-line-strong), var(--color-line-strong)) 0.35rem 1.16rem / 0.85rem 0.18rem
+      no-repeat,
+    var(--color-ink-soft);
+}
+.nav {
+  display: grid;
+  gap: var(--space-1);
+}
+.nav a {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  text-decoration: none;
+  color: var(--color-line-strong);
+}
+.nav a:hover {
+  color: var(--color-paper);
+}
+.nav a.active {
+  background: var(--color-ink-soft);
+  color: var(--color-paper);
+  box-shadow: inset 3px 0 0 var(--color-inforce-bright);
+}
+.user {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: auto;
+  font-size: var(--text-sm);
+  color: var(--color-line-strong);
+}
+.user strong {
+  color: var(--color-paper);
+}
+.clearance {
+  color: var(--color-restricted-on-dark);
+}
+.signout {
+  justify-self: start;
+  margin-top: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-paper);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.main {
+  width: 100%;
+  max-width: var(--content-max);
+  padding: var(--space-7) var(--space-6);
+}
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .rail {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+  }
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .user {
+    display: none;
+  }
+  .main {
+    padding: var(--space-5) var(--space-4);
+  }
+}

@@ -10,7 +10,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 49.96,
+    "ms": 36.9,
     "answer": "Dazu finde ich in den Richtlinien, die Sie einsehen dürfen und die zum gewählten Datum galten, keine Regelung. Bitte wenden Sie sich an den verantwortlichen Bereich.",
     "cited": null
   },
@@ -25,7 +25,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 43.5,
+    "ms": 62.09,
     "answer": "Dazu finde ich in den Richtlinien, die Sie einsehen dürfen und die zum gewählten Datum galten, keine Regelung. Bitte wenden Sie sich an den verantwortlichen Bereich.",
     "cited": null
   },
@@ -40,7 +40,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 45.88,
+    "ms": 38.61,
     "answer": "Dazu finde ich in den Richtlinien, die Sie einsehen dürfen und die zum gewählten Datum galten, keine Regelung. Bitte wenden Sie sich an den verantwortlichen Bereich.",
     "cited": null
   },
@@ -55,7 +55,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 47.82,
+    "ms": 30.62,
     "answer": "Dazu finde ich in den Richtlinien, die Sie einsehen dürfen und die zum gewählten Datum galten, keine Regelung. Bitte wenden Sie sich an den verantwortlichen Bereich.",
     "cited": null
   },
@@ -70,7 +70,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 35.69,
+    "ms": 35.89,
     "answer": "Zahlungsaufträge ab einem Betrag von 10.000 EUR sind nach dem Vier-Augen-Prinzip durch zwei berechtigte Mitarbeiter freizugeben. (Richtlinie Freigabe und Kontrolle im Zahlungsverkehr, Tz. 2.1, Version 3, gültig ab 01.04.2025)",
     "cited": "RL-ZV-01 v3 Tz. 2.1"
   },
@@ -85,7 +85,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 46.62,
+    "ms": 34.96,
     "answer": "Sicherheitsupdates für kritische Schwachstellen sind innerhalb von 3 Kalendertagen nach Veröffentlichung einzuspielen. (Patch- und Schwachstellenmanagement, Tz. 2.1, Version 3, gültig ab 01.06.2025)",
     "cited": "RL-IT-02 v3 Tz. 2.1"
   },
@@ -100,7 +100,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 31.28,
+    "ms": 32.88,
     "answer": "Dazu finde ich in den Richtlinien, die Sie einsehen dürfen und die zum gewählten Datum galten, keine Regelung. Bitte wenden Sie sich an den verantwortlichen Bereich.",
     "cited": null
   },
@@ -115,7 +115,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 31.68,
+    "ms": 34.59,
     "answer": "Mobiles Arbeiten aus dem EU-Ausland ist an höchstens 20 Arbeitstagen pro Kalenderjahr zulässig und vorab zu beantragen. (Mobiles Arbeiten, Tz. 3.1, Version 2, gültig ab 01.07.2024)",
     "cited": "RL-HR-03 v2 Tz. 3.1"
   },
@@ -130,7 +130,7 @@
     "cited_right": false,
     "in_evidence": true,
     "leaked": false,
-    "ms": 42.76,
+    "ms": 33.52,
     "answer": "Ab einem Auftragswert von 10.000 EUR sind mindestens drei Vergleichsangebote einzuholen. (Einkaufs- und Vergaberichtlinie, Tz. 2.1, Version 2, gültig ab 01.03.2025)",
     "cited": "RL-EK-01 v2 Tz. 2.1"
   },
@@ -145,7 +145,7 @@
     "cited_right": null,
     "in_evidence": null,
     "leaked": false,
-    "ms": 29.35,
+    "ms": 27.76,
     "answer": "Mobiles Arbeiten aus dem EU-Ausland ist an höchstens 20 Arbeitstagen pro Kalenderjahr zulässig und vorab zu beantragen. (Mobiles Arbeiten, Tz. 3.1, Version 2, gültig ab 01.07.2024)",
     "cited": "RL-HR-03 v2 Tz. 3.1"
   }

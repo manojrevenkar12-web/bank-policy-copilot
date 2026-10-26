@@ -55,7 +55,7 @@ def route(specs: tuple[ModelSpec, ...], evidence: list[Candidate]) -> tuple[Mode
     needed = max((c.classification for c in evidence), default=1)
     for spec in specs:
         if spec.enabled and spec.max_classification >= needed:
-            return spec, f"evidence up to classification {needed}; {spec.id} allowed up to {spec.max_classification}"
+            return spec, f"Belege bis Einstufung {needed}; {spec.id} darf bis Einstufung {spec.max_classification} sehen"
     raise RuntimeError("no model may see this evidence; config/models.yaml needs an in-process answerer")
 
 
@@ -86,7 +86,9 @@ class Extractive:
             text = f"{best.text} ({best.title}, Tz. {best.tz}, Version {best.version}, gültig ab {best.valid_from:%d.%m.%Y})"
             a = Answer("answered", text, [best], self.spec.id)
         if p is not None and self.model is not None:
-            a.notes.append(f"answerability {p:.2f} (threshold {self.model.threshold:.2f}, model {self.model.version})")
+            a.notes.append(
+                f"Antwortbarkeit {p:.2f} (Schwelle {self.model.threshold:.2f}, Modell {self.model.version})".replace(".", ",")
+            )
         return a
 
 
@@ -109,11 +111,11 @@ def build_prompt(r: Retrieval, evidence: list[Candidate]) -> str:
 def verify(answer_text: str, cited: list[Candidate]) -> str | None:
     """Every number in the answer must appear in a cited paragraph. Returns the problem, if any."""
     if not cited:
-        return "no citation"
+        return "keine Fundstelle"
     available = set().union(*(numbers(c.text) for c in cited))
     unsupported = numbers(answer_text) - available
     if unsupported:
-        return f"numbers not in the cited paragraphs: {', '.join(sorted(unsupported))}"
+        return f"Zahlen nicht im zitierten Absatz: {', '.join(sorted(unsupported))}"
     return None
 
 
@@ -159,7 +161,7 @@ class Anthropic:
             data = json.loads(match.group(0) if match else raw)
         except (httpx.HTTPError, ValueError, json.JSONDecodeError) as e:
             a = self.fallback.answer(r, evidence)
-            a.notes.append(f"{self.spec.id} failed ({type(e).__name__}); answered extractively")
+            a.notes.append(f"{self.spec.id} nicht erreichbar ({type(e).__name__}); Absatz zitiert")
             return a
         if not data.get("answerable"):
             return Answer("no_answer", NO_ANSWER, [], self.spec.id, tin, tout)
@@ -169,7 +171,7 @@ class Anthropic:
         if problem:
             a = self.fallback.answer(r, evidence)
             a.tokens_in, a.tokens_out = tin, tout
-            a.notes.append(f"{self.spec.id} answer rejected: {problem}; answered extractively")
+            a.notes.append(f"Antwort von {self.spec.id} verworfen: {problem}; Absatz zitiert")
             return a
         return Answer("answered", text, cited, self.spec.id, tin, tout)
 

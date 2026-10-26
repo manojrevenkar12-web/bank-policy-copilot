@@ -1,0 +1,71 @@
+/*
+ * Design tokens. Components use only these names, never raw values.
+ * The palette is the product's own vocabulary: teal for the rule in force on the chosen date,
+ * amber for a superseded version, plum for classification and access, red only for errors.
+ */
+:root {
+  --color-paper: #f6f7f4;
+  --color-surface: #ffffff;
+  --color-surface-sunk: #eef0ec;
+  --color-ink: #18212b;
+  --color-ink-soft: #3c4752;
+  --color-muted: #66707a;
+  --color-line: #dce0da;
+  --color-line-strong: #b9c0b8;
+
+  --color-inforce: #0f6e5c;
+  --color-inforce-bright: #2fb394;
+  --color-inforce-tint: #e2f1ec;
+  --color-superseded: #8f6200;
+  --color-superseded-tint: #f6edd8;
+  --color-restricted: #6d3b66;
+  --color-restricted-tint: #f1e6ef;
+  --color-restricted-on-dark: #d9b8d3;
+  --color-alert: #b42318;
+  --color-alert-tint: #fbe9e7;
+  --color-focus: #1d5fd8;
+
+  --font-ui: "IBM Plex Sans Variable", system-ui, sans-serif;
+  --font-text: "Source Serif 4 Variable", Georgia, serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.75rem;
+  --leading-tight: 1.15;
+  --leading-body: 1.5;
+  --leading-text: 1.6;
+  --weight-regular: 400;
+  --weight-medium: 520;
+  --weight-semibold: 620;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-pill: 999px;
+  --border: 1px solid var(--color-line);
+  --shadow-raised: 0 1px 2px rgb(24 33 43 / 6%), 0 8px 24px rgb(24 33 43 / 6%);
+
+  --rail-width: 15rem;
+  --content-max: 76rem;
+  --measure: 38rem;
+  --band-height: 2.25rem;
+  --control-height: 2.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-scale: 0;
+  }
+}

@@ -74,7 +74,7 @@ def run_set(pool: ConnectionPool, questions: list[dict[str, Any]]) -> list[Outco
         who = principal(pool, q["user"])
         if who is None:
             raise ValueError(f"unknown user {q['user']}")
-        with as_user(pool, who) as conn:
+        with as_user(pool, who, rollback=True) as conn:
             r = ask(
                 conn,
                 who,
@@ -163,6 +163,15 @@ def _share(xs: list[bool]) -> float | None:
     return round(sum(xs) / len(xs), 4) if xs else None
 
 
+def _record_first_run(first: Path, results: dict[str, Any], failures: list[dict[str, Any]]) -> None:
+    """The first run of a blind set is kept as it was; later runs never overwrite it."""
+    if first.exists():
+        return
+    first.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"recorded_at": results["generated_at"], "summary": results["sets"]["blind"], "failures": failures}
+    first.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def evaluate(
     pool: ConnectionPool, reports: Path, sets: tuple[str, ...] = ("dev", "regression-v1", "blind")
 ) -> dict[str, Any]:
@@ -181,27 +190,20 @@ def evaluate(
         counts = Counter(r.kind for r in rows)
         results["sets"][name]["kinds"] = dict(counts)
     reports.mkdir(parents=True, exist_ok=True)
+    if "blind" in results["sets"]:
+        _record_first_run(reports / "blind" / "FIRST_RUN.json", results, failures["blind"])
+    results["first_runs"] = {
+        name: json.loads(path.read_text(encoding="utf-8"))["summary"]
+        for name, path in (
+            ("blind", reports / "blind" / "FIRST_RUN.json"),
+            ("regression-v1", reports / "regression" / "blind-v1" / "FIRST_RUN.json"),
+        )
+        if path.exists()
+    }
     (reports / "evaluation.json").write_text(json.dumps(results, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     for name in ("dev", "regression-v1"):
         if name in failures:
             (reports / f"failures_{name}.json").write_text(
                 json.dumps(failures[name], indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-            )
-    if "blind" in results["sets"]:
-        first = reports / "blind" / "FIRST_RUN.json"
-        if not first.exists():
-            first.parent.mkdir(parents=True, exist_ok=True)
-            first.write_text(
-                json.dumps(
-                    {
-                        "recorded_at": results["generated_at"],
-                        "summary": results["sets"]["blind"],
-                        "failures": failures["blind"],
-                    },
-                    indent=2,
-                    ensure_ascii=False,
-                )
-                + "\n",
-                encoding="utf-8",
             )
     return results

@@ -1,0 +1,70 @@
+.band {
+  margin: 0;
+  padding-top: var(--space-5);
+}
+.track {
+  position: relative;
+  height: var(--band-height);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-sunk);
+}
+.segment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding-left: var(--space-2);
+  border-right: 2px solid var(--color-paper);
+  overflow: hidden;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+.segment:first-child {
+  border-radius: var(--radius-control) 0 0 var(--radius-control);
+}
+.cited {
+  background: var(--color-inforce-tint);
+  color: var(--color-inforce);
+  box-shadow: inset 0 -3px 0 var(--color-inforce);
+}
+.other {
+  background: var(--color-superseded-tint);
+  color: var(--color-superseded);
+}
+.marker {
+  position: absolute;
+  top: calc(-1 * var(--space-2));
+  bottom: calc(-1 * var(--space-2));
+  width: 2px;
+  margin-left: -1px;
+  background: var(--color-ink);
+}
+.markerLabel {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+.labelEnd {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.labelStart {
+  left: 0;
+  transform: none;
+}
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+}

@@ -37,7 +37,7 @@ def test_verify_rejects_numbers_not_in_the_cited_paragraph() -> None:
     c = cand(1, "Zahlungen ab 15.000 EUR brauchen zwei Freigaben.")
     assert verify("Ab 15.000 EUR.", [c]) is None
     assert "20000" in (verify("Ab 20.000 EUR.", [c]) or "")
-    assert verify("Ab 15.000 EUR.", []) == "no citation"
+    assert verify("Ab 15.000 EUR.", []) == "keine Fundstelle"
 
 
 def fake_claude(payload: dict[str, object] | Exception) -> httpx.Client:
@@ -69,7 +69,7 @@ def test_an_invented_number_falls_back_to_the_quote() -> None:
         retrieval(c), [c]
     )
     assert a.model == "extractive" and "15.000 EUR" in a.text
-    assert any("rejected" in n for n in a.notes)
+    assert any("verworfen" in n for n in a.notes)
 
 
 def test_model_declines_and_outages_are_handled() -> None:
@@ -78,7 +78,7 @@ def test_model_declines_and_outages_are_handled() -> None:
     a = Anthropic(SPECS[0], ext, fake_claude({"answerable": False})).answer(retrieval(c), [c])
     assert a.outcome == "no_answer"
     a = Anthropic(SPECS[0], ext, fake_claude(httpx.ConnectError("down"))).answer(retrieval(c), [c])
-    assert a.model == "extractive" and any("failed" in n for n in a.notes)
+    assert a.model == "extractive" and any("nicht erreichbar" in n for n in a.notes)
 
 
 def test_extractive_rules_without_a_model() -> None:

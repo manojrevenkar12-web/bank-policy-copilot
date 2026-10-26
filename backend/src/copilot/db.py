@@ -45,13 +45,14 @@ def create_pool(url: str, size: int = 10) -> Pool:
 
 
 @contextmanager
-def as_user(pool: Pool, p: Principal) -> Iterator[Conn]:
+def as_user(pool: Pool, p: Principal, *, rollback: bool = False) -> Iterator[Conn]:
     """A transaction in which Postgres shows only what this user may read.
 
     The settings are transaction-local (set_config(..., true)), so a pooled connection never
-    carries one user's rights into the next request.
+    carries one user's rights into the next request. `rollback` discards everything the unit of
+    work wrote (the evaluation asks as real users without leaving questions in their history).
     """
-    with pool.connection() as conn, conn.transaction():
+    with pool.connection() as conn, conn.transaction(force_rollback=rollback):
         conn.execute(
             "SELECT set_config('app.login', %s, true), set_config('app.clearance', %s, true),"
             " set_config('app.groups', %s, true)",
